@@ -36,18 +36,21 @@ int main(void) {
         /* --- PROCESSO PAI (escritor) --- */
 
         // TODO 2: Feche o descritor que o pai não usa.
-
+        close(fd[0]);
         printf("[pai]  enviando: %s\n", mensagem);
 
         // TODO 3: Escreva a mensagem no pipe.
+        write(fd[1], mensagem, strlen(mensagem));
 
         // TODO 4: Feche o descritor de escrita (sinaliza EOF pro filho).
+        close(fd[1]);
 
         wait(NULL);
     } else {
         /* --- PROCESSO FILHO (leitor) --- */
 
         // TODO 5: Feche o descritor que o filho não usa.
+        close(fd[1]);
 
         char buffer[256];
 
@@ -55,15 +58,21 @@ int main(void) {
         //         read() retorna o número de bytes lidos.
         //         Use esse valor para colocar o '\0' no final do buffer.
         ssize_t n = 0; // substitua por read()
+        n = read(fd[0], buffer, sizeof(buffer) - 1);
+        
 
         buffer[n] = '\0';
 
         // TODO 7: Converta cada caractere do buffer para maiúscula.
         //         Use toupper() de <ctype.h>.
+        for (ssize_t i = 0; i < n; i++) {
+            buffer[i] = toupper(buffer[i]);
+        }
 
         printf("[filho] recebido: %s\n", buffer);
 
         // TODO 8: Feche o descritor de leitura.
+        close(fd[0]);
     }
 
     return 0;
